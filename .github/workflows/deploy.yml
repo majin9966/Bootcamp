@@ -44,5 +44,5 @@ jobs:
 
       - name: "What-if templates"
         run: |
-          az deployment group what-if --resource-group ${{ inputs.resourceGroupName }} --template-file ${{ inputs.templateFilePath }} --parameters ${{ inputs.templateParametersFilePath }}
+          az deployment group create --resource-group ${{ inputs.resourceGroupName }} --template-file ${{ inputs.templateFilePath }} --parameters ${{ inputs.templateParametersFilePath }}
  
