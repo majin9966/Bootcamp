@@ -1,54 +1,38 @@
-on:
-  workflow_dispatch:
+parameters:
+  - name: serviceConnection
+    type: string
+  - name: resourceGroupName
+    type: string
+  - name: templateFilePath
+    type: string
+  - name: templateParametersFilePath
+    type: string
+ 
+ 
+steps:
+  - task: AzureCLI@2
+    displayName: "Lint Templates"
     inputs:
-      templateFilePath:
-        description: Path to the Bicep or ARM template file
-        required: true
-        type: string
-      resourceGroupName:
-        description: Azure resource group name
-        required: true
-        type: string
-      templateParametersFilePath:
-        description: Path to the template parameters file
-        required: true
-        type: string
-      pathToPublish:
-        description: Optional path to publish as an artifact
-        required: false
-        type: string
-        default: ''
-
-jobs:
-  build:
-    runs-on: ubuntu-latest
-
-    steps:
-    - name: "Checkout source code"
-      uses: actions/checkout@main
-
-    - name: "Login to Azure"
-      uses: azure/login@v1
-      with:
-        client-id: ${{ secrets.AZURE_CLIENT_ID }}
-        tenant-id: ${{ secrets.AZURE_TENANT_ID }}
-        subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-
-    - name: "Lint Bicep File"
-      run: |
-        az bicep build --file ${{ inputs.templateFilePath }}
-
-    - name: "Validate Templates"
-      run: |
-        az deployment group validate --resource-group ${{ inputs.resourceGroupName }} --template-file ${{ inputs.templateFilePath }} --parameters ${{ inputs.templateParametersFilePath }}
-
-    - name: "What-If Templates"
-      run: |
-        az deployment group what-if --resource-group ${{ inputs.resourceGroupName }} --template-file ${{ inputs.templateFilePath }} --parameters ${{ inputs.templateParametersFilePath }}
-
-    - name: "Publish Artifact"
-      if: ${{ inputs.pathToPublish != '' }}
-      uses: actions/upload-artifact@v4
-      with:
-        name: infra-templates
-        path: ${{ inputs.pathToPublish }}
+      azureSubscription: ${{ parameters.serviceConnection }}
+      scriptType: pscore
+      scriptLocation: inlineScript
+      inlineScript: |
+        az bicep build --file ${{ parameters.templateFilePath }}
+ 
+  - task: AzureCLI@2
+    displayName: "Validate Templates"
+    inputs:
+      azureSubscription: ${{ parameters.serviceConnection }}
+      scriptType: pscore
+      scriptLocation: inlineScript
+      inlineScript: |
+        az deployment group validate --resource-group ${{ parameters.resourceGroupName }} --template-file ${{ parameters.templateFilePath }} --parameters ${{ parameters.templateParametersFilePath }}
+ 
+  - task: AzureCLI@2
+    displayName: "What If Templates"
+    inputs:
+      azureSubscription: ${{ parameters.serviceConnection }}
+      scriptType: pscore
+      scriptLocation: inlineScript
+      inlineScript: |
+        az deployment group what-if --resource-group ${{ parameters.resourceGroupName }} --template-file ${{ parameters.templateFilePath }} --parameters ${{ parameters.templateParametersFilePath }}
