@@ -7,7 +7,7 @@ parameters:
     type: string
   - name: templateParametersFilePath
     type: string
- 
+
  
 steps:
   - task: AzureCLI@2
