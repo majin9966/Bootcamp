@@ -6,11 +6,11 @@ on:
       templateFilePath:
         description: "Path to the Bicep template file"
         required: false
-        default: "main.bicep"
+        default: "infra/main.bicep"
       templateParametersFilePath:
         description: "Path to the Bicep parameters file"
         required: false
-        default: "dev.bicepparam"
+        default: "infra/dev.bicepparam"
       resourceGroupName:
         description: "Target resource group"
         required: false
