@@ -1,3 +1,3 @@
 using 'main.bicep'
 
-param upn = 'lafim'
+param upn = 'XX'
